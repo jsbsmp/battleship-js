@@ -8,77 +8,77 @@
     <title>Game</title>
 </head>
 <body onload="checkStatus()">
-<div id="placement-field1" class="w3-hide w3-cell-row">
-    <div class="w3-container w3-cell">
+<div id="placement-field1" class="w3-hide w3-row">
+    <div class="w3-col" style="width:400px">
         <table>
             <tr>
                 <td>&nbsp;</td>
                 <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td><c:out value="${col}"/></td>
+                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
                 </c:forTokens>
             </tr>
             <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
                 <tr>
-                    <td><c:out value="${row}"/></td>
+                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td><input type="radio" id="${col}${row}" onchange="cellClicked('${col}${row}')"/></td>
+                        <td class="w3-panel w3-border w3-padding-small"><input type="radio" id="${col}${row}" onchange="cellClicked('${col}${row}')"/></td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
         </table>
     </div>
-    <div class="w3-container w3-cell">
+    <div class="w3-rest">
         <table>
             <tr>
                 <td>&nbsp;</td>
                 <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td><c:out value="${col}"/></td>
+                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
                 </c:forTokens>
             </tr>
             <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
                 <tr>
-                    <td><c:out value="${row}"/></td>
+                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td></td>
+                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}" onload="checkCellState('${col}${row}')"></td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
         </table>
     </div>
-    <div class="w3-container w3-cell w3-cell-bottom" ><button type="button" onclick="fire()">Fire!</button></div>
+    <div class="w3-row" ><button type="button" onclick="fire()">Fire!</button></div>
 </div>
-<div id="placement-field2" class="w3-hide w3-cell-row">
-    <div class="w3-container w3-cell">
+<div id="placement-field2" class="w3-hide w3-row">
+    <div class="w3-col" style="width:400px">
         <table>
             <tr>
                 <td>&nbsp;</td>
                 <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td><c:out value="${col}"/></td>
+                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
                 </c:forTokens>
             </tr>
             <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
                 <tr>
-                    <td><c:out value="${row}"/></td>
+                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td></td>
+                        <td class="w3-panel w3-border w3-padding-small"></td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
         </table>
     </div>
-    <div class="w3-container w3-cell">
+    <div class="w3-rest">
         <table>
             <tr>
                 <td>&nbsp;</td>
                 <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td><c:out value="${col}"/></td>
+                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
                 </c:forTokens>
             </tr>
             <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
                 <tr>
-                    <td><c:out value="${row}"/></td>
+                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td></td>
+                        <td class="w3-panel w3-border w3-padding-small"></td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
@@ -123,6 +123,30 @@
             } else {
                 document.getElementById("placement-field1").classList.add("w3-hide");
                 document.getElementById("placement-field2").classList.remove("w3-hide");
+                window.setTimeout(function () {
+                    checkStatus();
+                }, 1000);
+            }
+        });
+    }
+
+    function checkCellState(address) {
+        console.log("checking status");
+        fetch("<c:url value='/api/game/state/'/>", {
+            "method": "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then(function (response) {
+            return response.json();
+        }).then(function (cellstate) {
+            console.log(JSON.stringify(cellstate))
+
+            if (cellstate.status==="SHIP") {
+                document.getElementById(address).classList.add("w3-red");
+            } else {
+                document.getElementById("cell").classList.add("w3-gray");
                 window.setTimeout(function () {
                     checkStatus();
                 }, 1000);

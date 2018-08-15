@@ -106,4 +106,15 @@ public class GameStore {
                 .getResultList();
         cells.forEach(c -> em.remove(c));
     }
+
+    public Optional<Cell> getCells(Game game, User user) {
+        return em.createQuery(
+                "select c " +
+                        "from Cell c " +
+                        "where c.user=:user and c.game=:game", Cell.class)
+                .setParameter("game", game)
+                .setParameter("user", user)
+                .getResultStream()
+                .findFirst();
+    }
 }

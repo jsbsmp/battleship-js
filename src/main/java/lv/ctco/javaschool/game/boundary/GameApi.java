@@ -4,9 +4,7 @@ import lombok.extern.java.Log;
 import lv.ctco.javaschool.auth.control.UserStore;
 import lv.ctco.javaschool.auth.entity.domain.User;
 import lv.ctco.javaschool.game.control.GameStore;
-import lv.ctco.javaschool.game.entity.Game;
-import lv.ctco.javaschool.game.entity.GameDto;
-import lv.ctco.javaschool.game.entity.GameStatus;
+import lv.ctco.javaschool.game.entity.*;
 
 import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
@@ -18,6 +16,7 @@ import javax.persistence.PersistenceContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -104,9 +103,20 @@ public class GameApi {
         User currentUser = userStore.getCurrentUser();
         Optional<Game> game = gameStore.getGameForUser(currentUser);
         game.ifPresent(g -> {
-            boolean p1a = g.isPlayer1Active();
-            g.setPlayer1Active(!p1a);
-            g.setPlayer2Active(p1a);
+            boolean player1Active = g.isPlayer1Active();
+            g.setPlayer1Active(!player1Active);
+            g.setPlayer2Active(player1Active);
         });
+    }
+
+    @POST
+    @RolesAllowed({"ADMIN","USER"})
+    @Path("/state/{address}")
+    public CellStateDto getCellState(@PathParam("address") String address) {
+        User currentUser = userStore.getCurrentUser();
+        Optional<Game> game = gameStore.getGameForUser(currentUser);
+        CellStateDto cellStateDto = new CellStateDto();
+        Optional<Cell> cell = gameStore.getCells(game.get(),currentUser);
+        return cellStateDto;
     }
 }
