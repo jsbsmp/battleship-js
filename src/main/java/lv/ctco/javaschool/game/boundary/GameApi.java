@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Path("/game")
 @Stateless
@@ -129,31 +130,23 @@ public class GameApi {
 
     @GET
     @RolesAllowed({"ADMIN", "USER"})
-    @Path("/statef/{address}")
-    public CellStateDto getCellStateFalse(@PathParam("address") String address) {
+    @Path("/cells")
+    public List<CellStateDto> getCells() {
         User currentUser = userStore.getCurrentUser();
-        Optional<Game> game = gameStore.getGameForUser(currentUser);
-        CellStateDto cellStateDto = new CellStateDto();
+        Optional<Game> game = gameStore.getStartedGameFor(currentUser, GameStatus.STARTED);
         return game.map(g -> {
-            Optional<Cell> cell = gameStore.getCell(g, currentUser, address,false);
-            cellStateDto.setAddress(address);
-            cell.ifPresent(c -> cellStateDto.setState(c.getState()));
-            return cellStateDto;
+            List<Cell> cells = gameStore.getCells(g, currentUser);
+            return cells.stream()
+                    .map(this::convertToDto)
+                    .collect(Collectors.toList());
         }).orElseThrow(IllegalStateException::new);
     }
 
-    @GET
-    @RolesAllowed({"ADMIN", "USER"})
-    @Path("/statet/{address}")
-    public CellStateDto getCellStateTrue(@PathParam("address") String address) {
-        User currentUser = userStore.getCurrentUser();
-        Optional<Game> game = gameStore.getGameForUser(currentUser);
-        CellStateDto cellStateDto = new CellStateDto();
-        return game.map(g -> {
-            Optional<Cell> cell = gameStore.getCell(g, currentUser, address,true);
-            cellStateDto.setAddress(address);
-            cell.ifPresent(c -> cellStateDto.setState(c.getState()));
-            return cellStateDto;
-        }).orElseThrow(IllegalStateException::new);
+    private CellStateDto convertToDto(Cell cell) {
+        CellStateDto dto = new CellStateDto();
+        dto.setTargetArea(cell.isTargetArea());
+        dto.setAddress(cell.getAddress());
+        dto.setState(cell.getState());
+        return dto;
     }
 }

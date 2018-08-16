@@ -1,124 +1,71 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <title>Game</title>
+    <style>
+        td.SHIP {
+            background-color: lightgreen;
+        }
+        td.MISS {
+            background-color: lightblue;
+        }
+        td.HIT {
+            background-color: darkred;
+        }
+    </style>
 </head>
-<body onload="checkStatus(); drawShips();">
-
-<div id="placement-field1" class="w3-hide w3-row">
-    <div class="w3-row">
-        <h1>Make your move</h1>
-    </div>
-    <div class="w3-col" style="width:400px">
-        <table>
-            <tr>
-                <td>&nbsp;</td>
-                <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
-                </c:forTokens>
-            </tr>
-            <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
-                <tr>
-                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
-                    <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td id="${col}${row}4" class="w3-panel w3-border w3-padding-small">
-                            <input name="address" type="radio" id="${col}${row}"
-                                   onchange="cellClicked('${col}${row}')"/>
-                        </td>
-                    </c:forTokens>
-                </tr>
-            </c:forTokens>
-        </table>
-    </div>
-    <div class="w3-rest">
-        <table>
-            <tr>
-                <td>&nbsp;</td>
-                <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
-                </c:forTokens>
-            </tr>
-            <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
-                <tr>
-                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
-                    <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}1"></td>
-                    </c:forTokens>
-                </tr>
-            </c:forTokens>
-        </table>
-    </div>
-    <div class="w3-row">
-        <button type="button" onclick="fire()">Fire!</button>
-    </div>
+<body onload="checkStatus()">
+<div id="wait-another" class="w3-hide">
+    <h1>Please wait for another player move</h1>
 </div>
-<div id="placement-field2" class="w3-hide w3-row">
-    <div class="w3-row">
-        <h1>Wait for another player move</h1>
-    </div>
-    <div class="w3-col" style="width:400px">
-        <table>
+<div id="make-move" class="w3-hide">
+    <h1>Make your move</h1>
+</div>
+<div class="w3-col" style="width:400px">
+    <table>
+        <tr>
+            <td>&nbsp;</td>
+            <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
+                <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
+            </c:forTokens>
+        </tr>
+        <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
             <tr>
-                <td>&nbsp;</td>
+                <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                 <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
+                    <td id="t${col}${row}" class="w3-panel w3-border w3-padding-small">
+                        <input name="address" type="radio" id="${col}${row}"/></td>
                 </c:forTokens>
             </tr>
-            <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
-                <tr>
-                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
-                    <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}3"></td>
-                    </c:forTokens>
-                </tr>
+        </c:forTokens>
+    </table>
+</div>
+<div class="w3-rest">
+    <table>
+        <tr>
+            <td>&nbsp;</td>
+            <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
+                <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
             </c:forTokens>
-        </table>
-    </div>
-    <div class="w3-rest">
-        <table>
+        </tr>
+        <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
             <tr>
-                <td>&nbsp;</td>
+                <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                 <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${col}"/></td>
+                    <td id="m${col}${row}" class="w3-panel w3-border w3-padding-small"></td>
                 </c:forTokens>
             </tr>
-            <c:forTokens items="1,2,3,4,5,6,7,8,9,10" delims="," var="row">
-                <tr>
-                    <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
-                    <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}2"></td>
-                    </c:forTokens>
-                </tr>
-            </c:forTokens>
-        </table>
-    </div>
+        </c:forTokens>
+    </table>
+</div>
+<div id="select-fire" class="w3-hide">
+    <button type="button" onclick="fire()">Fire!</button>
 </div>
 <script>
-    var data = {};
-    function cellClicked(id) {
-        var checkbox = document.getElementById(id);
-        console.log(id + " " + checkbox.checked);
-        data[id] = checkbox.checked ? "SHIP" : "EMPTY";
-    }
-    function fire() {
-        console.log("firing");
-        var checked = document.querySelector('input[name=address]:checked');
-        var checkedAddr = checked.id;
-        fetch("<c:url value='/api/game/fire'/>/" + checkedAddr, {
-            "method": "POST",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then(function (response) {
-            console.log("DONE");
-            checkStatus();
-        });
-    }
+
     function checkStatus() {
         console.log("checking status");
         fetch("<c:url value='/api/game/status'/>", {
@@ -130,38 +77,29 @@
         }).then(function (response) {
             return response.json();
         }).then(function (game) {
-            console.log(JSON.stringify(game))
-            if (game.playerActive) {
-                document.getElementById("placement-field1").classList.remove("w3-hide");
-                document.getElementById("placement-field2").classList.add("w3-hide");
-            } else {
-                document.getElementById("placement-field1").classList.add("w3-hide");
-                document.getElementById("placement-field2").classList.remove("w3-hide");
+            console.log(JSON.stringify(game));
+            if (game.status === "STARTED" && game.playerActive) {
+                document.getElementById("wait-another").classList.add("w3-hide");
+                document.getElementById("make-move").classList.remove("w3-hide");
+                document.getElementById("select-fire").classList.remove("w3-hide");
+                setRadioButtonsVisible(true);
+            } else if (game.status === "STARTED" && !game.playerActive) {
+                document.getElementById("wait-another").classList.remove("w3-hide");
+                document.getElementById("make-move").classList.add("w3-hide");
+                document.getElementById("select-fire").classList.add("w3-hide");
+                setRadioButtonsVisible(false);
                 window.setTimeout(function () {
                     checkStatus();
-                    drawShips();
                 }, 1000);
+            } else {
+                return;
             }
+            drawShips();
         });
     }
 
     function drawShips() {
-        var i;
-        var j;
-        var address;
-        var alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-        for (i = 1; i < 11; i++) {
-            for (j = 0; j < alphabets.length; j++) {
-                address = alphabets[j] + i;
-                checkCellStateF(address);
-                checkCellStateT(address);
-            }
-        }
-    }
-
-    function checkCellStateF(address) {
-        console.log("checking cell state false");
-        fetch("<c:url value='/api/game/statef/'/>" + address, {
+        fetch("<c:url value='/api/game/cells'/>", {
             "method": "GET",
             headers: {
                 'Accept': 'application/json',
@@ -169,53 +107,43 @@
             }
         }).then(function (response) {
             return response.json();
-        }).then(function (cellstate) {
-            console.log("===> JSON.stringify(cellstate): " + JSON.stringify(cellstate));
-            console.log("===> cellstate.state: " + cellstate.state);
-            if (cellstate.state === "SHIP") {
-                document.getElementById(address + "1").classList.add("w3-green");
-                document.getElementById(address + "2").classList.add("w3-green");
-            } else if (cellstate.state === "MISS") {
-                document.getElementById(address + "1").classList.add("w3-light-blue");
-                document.getElementById(address + "2").classList.add("w3-light-blue");
-            } else if (cellstate.state === "HIT") {
-                document.getElementById(address + "1").classList.add("w3-red");
-                document.getElementById(address + "2").classList.add("w3-red");
+        }).then(function (cells) {
+            cells.forEach(function (c) {
+                var id = (c.targetArea ? "t" : "m") + c.address;
+                var tblCell = document.getElementById(id);
+                tblCell.className = c.state;
+            });
+        });
+    }
+
+    function setRadioButtonsVisible(visible) {
+        var radioButtons = document.querySelectorAll('input[name=address]');
+        radioButtons.forEach(function (btn) {
+            if (visible) {
+                btn.classList.remove("w3-hide");
             } else {
-                document.getElementById(address + "1").classList.add("w3-white");
-                document.getElementById(address + "2").classList.add("w3-white");
+                btn.classList.add("w3-hide");
             }
         });
     }
 
-    function checkCellStateT(address) {
-        console.log("checking cell state true");
-        fetch("<c:url value='/api/game/statet/'/>" + address, {
-            "method": "GET",
+    function fire() {
+        console.log("firing");
+        var checked = document.querySelector('input[name=address]:checked');
+        var checkedAddr = checked.id;
+        console.log("firing address " + checkedAddr);
+        fetch("<c:url value='/api/game/fire'/>/" + checkedAddr, {
+            "method": "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             }
         }).then(function (response) {
-            return response.json();
-        }).then(function (cellstate) {
-            console.log("===> JSON.stringify(cellstate): " + JSON.stringify(cellstate));
-            console.log("===> cellstate.state: " + cellstate.state);
-            if (cellstate.state === "SHIP") {
-                document.getElementById(address + "3").classList.add("w3-green");
-                document.getElementById(address + "4").classList.add("w3-green");
-            } else if (cellstate.state === "MISS") {
-                document.getElementById(address + "3").classList.add("w3-light-blue");
-                document.getElementById(address + "4").classList.add("w3-light-blue");
-            } else if (cellstate.state === "HIT") {
-                document.getElementById(address + "3").classList.add("w3-red");
-                document.getElementById(address + "4").classList.add("w3-red");
-            } else {
-                document.getElementById(address + "3").classList.add("w3-white");
-                document.getElementById(address + "4").classList.add("w3-white");
-            }
+            console.log("DONE");
+            checkStatus();
         });
     }
+
 </script>
 </body>
 </html>

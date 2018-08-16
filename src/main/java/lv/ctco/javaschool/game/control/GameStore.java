@@ -108,4 +108,15 @@ public class GameStore {
                 .getResultStream()
                 .findFirst();
     }
+
+    public List<Cell> getCells(Game game, User player) {
+        return em.createQuery(
+                "select c " +
+                        "from Cell c " +
+                        "where c.game = :game " +
+                        "  and c.user = :user ", Cell.class)
+                .setParameter("game", game)
+                .setParameter("user", player)
+                .getResultList();
+    }
 }
