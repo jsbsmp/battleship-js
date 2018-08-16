@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @Stateless
 public class GameStore {
+
     @PersistenceContext
     private EntityManager em;
 
@@ -107,13 +108,13 @@ public class GameStore {
         cells.forEach(c -> em.remove(c));
     }
 
-    public Optional<Cell> getCells(Game game, User user) {
+    public Optional<Cell> getCell(Game game, User user, String address) {
         return em.createQuery(
-                "select c " +
-                        "from Cell c " +
-                        "where c.user=:user and c.game=:game", Cell.class)
+                "select c from Cell c " +
+                        "where c.user=:user and c.game=:game and c.address=:address", Cell.class)
                 .setParameter("game", game)
                 .setParameter("user", user)
+                .setParameter("address", address)
                 .getResultStream()
                 .findFirst();
     }

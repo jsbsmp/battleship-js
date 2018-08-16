@@ -38,7 +38,7 @@
         data[id] = checkbox.checked ? "SHIP" : "EMPTY";
     }
     function ready() {
-        console.log(JSON.stringify(data));
+        console.log("===> JSON.stringify(data): " + JSON.stringify(data));
         fetch("<c:url value='/api/game/cells'/>", {
             "method": "POST",
             headers: {

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <title>Game</title>
 </head>
-<body onload="checkStatus()">
+<body onload="checkStatus(); init();">
 <div id="placement-field1" class="w3-hide w3-row">
     <div class="w3-col" style="width:400px">
         <table>
@@ -21,7 +21,9 @@
                 <tr>
                     <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small"><input type="radio" id="${col}${row}" onchange="cellClicked('${col}${row}')"/></td>
+                        <td class="w3-panel w3-border w3-padding-small"><input type="radio" id="${col}${row}"
+                                                                               onchange="cellClicked('${col}${row}')"/>
+                        </td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
@@ -39,13 +41,16 @@
                 <tr>
                     <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}" onload="checkCellState('${col}${row}')"></td>
+                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}2"
+                            ></td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
         </table>
     </div>
-    <div class="w3-row" ><button type="button" onclick="fire()">Fire!</button></div>
+    <div class="w3-row">
+        <button type="button" onclick="fire()">Fire!</button>
+    </div>
 </div>
 <div id="placement-field2" class="w3-hide w3-row">
     <div class="w3-col" style="width:400px">
@@ -130,9 +135,22 @@
         });
     }
 
+    function init() {
+        var i;
+        var j;
+        var address;
+        var alphabets = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
+        for (i = 1; i < 11; i++) {
+            for (j = 0; j < alphabets.length; j++) {
+                address = alphabets[j] + i;
+                checkCellState(address);
+            }
+        }
+    }
+
     function checkCellState(address) {
-        console.log("checking status");
-        fetch("<c:url value='/api/game/state/'/>", {
+        console.log("checking cell state");
+        fetch("<c:url value='/api/game/state/'/>" + address, {
             "method": "GET",
             headers: {
                 'Accept': 'application/json',
@@ -141,15 +159,10 @@
         }).then(function (response) {
             return response.json();
         }).then(function (cellstate) {
-            console.log(JSON.stringify(cellstate))
-
-            if (cellstate.status==="SHIP") {
-                document.getElementById(address).classList.add("w3-red");
-            } else {
-                document.getElementById("cell").classList.add("w3-gray");
-                window.setTimeout(function () {
-                    checkStatus();
-                }, 1000);
+            console.log("===> JSON.stringify(cellstate): " + JSON.stringify(cellstate));
+            console.log("===> cellstate.state: " + cellstate.state);
+            if (cellstate.state === "SHIP") {
+                document.getElementById(address + "2").classList.add("w3-green");
             }
         });
     }

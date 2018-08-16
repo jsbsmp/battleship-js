@@ -10,6 +10,7 @@ import javax.annotation.security.RolesAllowed;
 import javax.ejb.Stateless;
 import javax.inject.Inject;
 import javax.json.JsonObject;
+import javax.json.JsonString;
 import javax.json.JsonValue;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -66,7 +67,7 @@ public class GameApi {
                 for (Map.Entry<String, JsonValue> pair : field.entrySet()) {
                     log.info(pair.getKey() + " - " + pair.getValue());
                     String address = pair.getKey();
-                    String value = pair.getValue().toString();
+                    String value = ((JsonString)pair.getValue()).getString();
                     if ("SHIP".equals(value)) {
                         ships.add(address);
                     }
@@ -97,7 +98,7 @@ public class GameApi {
     }
 
     @POST
-    @RolesAllowed({"ADMIN","USER"})
+    @RolesAllowed({"ADMIN", "USER"})
     @Path("/fire")
     public void doFire() {
         User currentUser = userStore.getCurrentUser();
@@ -109,14 +110,19 @@ public class GameApi {
         });
     }
 
-    @POST
-    @RolesAllowed({"ADMIN","USER"})
+    @GET
+    @RolesAllowed({"ADMIN", "USER"})
     @Path("/state/{address}")
     public CellStateDto getCellState(@PathParam("address") String address) {
         User currentUser = userStore.getCurrentUser();
         Optional<Game> game = gameStore.getGameForUser(currentUser);
         CellStateDto cellStateDto = new CellStateDto();
-        Optional<Cell> cell = gameStore.getCells(game.get(),currentUser);
-        return cellStateDto;
+        return game.map(g -> {
+            Optional<Cell> cell = gameStore.getCell(g, currentUser, address);
+            System.out.println(cell.toString());
+            cellStateDto.setAddress(address);
+            cell.ifPresent(c -> cellStateDto.setState(c.getState()));
+            return cellStateDto;
+        }).orElseThrow(IllegalStateException::new);
     }
 }
