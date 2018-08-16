@@ -9,7 +9,7 @@
 </head>
 <body onload="checkStatus()">
 <div id="wait-another" class="w3-hide">
-    <h1>Please wait another player</h1>
+    <h1>Please wait for another player</h1>
 </div>
 <div id="placement-field" class="w3-hide">
     <table>

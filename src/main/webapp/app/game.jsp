@@ -25,7 +25,7 @@
                 <tr>
                     <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small">
+                        <td id="${col}${row}4" class="w3-panel w3-border w3-padding-small">
                             <input name="address" type="radio" id="${col}${row}"
                                    onchange="cellClicked('${col}${row}')"/>
                         </td>
@@ -72,7 +72,7 @@
                 <tr>
                     <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small"></td>
+                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}3"></td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
@@ -153,14 +153,15 @@
         for (i = 1; i < 11; i++) {
             for (j = 0; j < alphabets.length; j++) {
                 address = alphabets[j] + i;
-                checkCellState(address);
+                checkCellStateF(address);
+                checkCellStateT(address);
             }
         }
     }
 
-    function checkCellState(address) {
-        console.log("checking cell state");
-        fetch("<c:url value='/api/game/state/'/>" + address, {
+    function checkCellStateF(address) {
+        console.log("checking cell state false");
+        fetch("<c:url value='/api/game/statef/'/>" + address, {
             "method": "GET",
             headers: {
                 'Accept': 'application/json',
@@ -174,9 +175,44 @@
             if (cellstate.state === "SHIP") {
                 document.getElementById(address + "1").classList.add("w3-green");
                 document.getElementById(address + "2").classList.add("w3-green");
+            } else if (cellstate.state === "MISS") {
+                document.getElementById(address + "1").classList.add("w3-light-blue");
+                document.getElementById(address + "2").classList.add("w3-light-blue");
+            } else if (cellstate.state === "HIT") {
+                document.getElementById(address + "1").classList.add("w3-red");
+                document.getElementById(address + "2").classList.add("w3-red");
             } else {
                 document.getElementById(address + "1").classList.add("w3-white");
                 document.getElementById(address + "2").classList.add("w3-white");
+            }
+        });
+    }
+
+    function checkCellStateT(address) {
+        console.log("checking cell state true");
+        fetch("<c:url value='/api/game/statet/'/>" + address, {
+            "method": "GET",
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        }).then(function (response) {
+            return response.json();
+        }).then(function (cellstate) {
+            console.log("===> JSON.stringify(cellstate): " + JSON.stringify(cellstate));
+            console.log("===> cellstate.state: " + cellstate.state);
+            if (cellstate.state === "SHIP") {
+                document.getElementById(address + "3").classList.add("w3-green");
+                document.getElementById(address + "4").classList.add("w3-green");
+            } else if (cellstate.state === "MISS") {
+                document.getElementById(address + "3").classList.add("w3-light-blue");
+                document.getElementById(address + "4").classList.add("w3-light-blue");
+            } else if (cellstate.state === "HIT") {
+                document.getElementById(address + "3").classList.add("w3-red");
+                document.getElementById(address + "4").classList.add("w3-red");
+            } else {
+                document.getElementById(address + "3").classList.add("w3-white");
+                document.getElementById(address + "4").classList.add("w3-white");
             }
         });
     }

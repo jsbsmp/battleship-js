@@ -57,7 +57,7 @@ public class GameStore {
 
 
     public void setCellState(Game game, User player, String address, boolean targetArea, CellState state) {
-        Optional<Cell> cell = findCell(game, player, address, targetArea);
+        Optional<Cell> cell = getCell(game, player, address, targetArea);
         if (cell.isPresent()) {
             cell.get().setState(state);
         } else {
@@ -69,21 +69,6 @@ public class GameStore {
             newCell.setState(state);
             em.persist(newCell);
         }
-    }
-
-    public Optional<Cell> findCell(Game game, User player, String address, boolean targetArea) {
-        return em.createQuery(
-                "select c from Cell c " +
-                        "where c.game = :game " +
-                        "  and c.user = :user " +
-                        "  and c.targetArea = :target " +
-                        "  and c.address = :address", Cell.class)
-                .setParameter("game", game)
-                .setParameter("user", player)
-                .setParameter("target", targetArea)
-                .setParameter("address", address)
-                .getResultStream()
-                .findFirst();
     }
 
     public void setShips(Game game, User user, boolean targetArea, List<String> ships) {
@@ -112,13 +97,14 @@ public class GameStore {
         cells.forEach(c -> em.remove(c));
     }
 
-    public Optional<Cell> getCell(Game game, User user, String address) {
+    public Optional<Cell> getCell(Game game, User user, String address, boolean targetArea) {
         return em.createQuery(
                 "select c from Cell c " +
-                        "where c.user=:user and c.game=:game and c.address=:address", Cell.class)
+                        "where c.user=:user and c.game=:game and c.address=:address and c.targetArea=:target", Cell.class)
                 .setParameter("game", game)
                 .setParameter("user", user)
                 .setParameter("address", address)
+                .setParameter("target", targetArea)
                 .getResultStream()
                 .findFirst();
     }

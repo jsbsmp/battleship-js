@@ -106,7 +106,7 @@ public class GameApi {
         Optional<Game> game = gameStore.getGameForUser(currentUser);
         game.ifPresent(g -> {
             User oppositeUser = g.getOpposite(currentUser);
-            Optional<Cell> enemyCell = gameStore.findCell(g, oppositeUser, address, false);
+            Optional<Cell> enemyCell = gameStore.getCell(g, oppositeUser, address, false);
             if (enemyCell.isPresent()) {
                 Cell c = enemyCell.get();
                 if (c.getState() == CellState.SHIP) {
@@ -129,14 +129,28 @@ public class GameApi {
 
     @GET
     @RolesAllowed({"ADMIN", "USER"})
-    @Path("/state/{address}")
-    public CellStateDto getCellState(@PathParam("address") String address) {
+    @Path("/statef/{address}")
+    public CellStateDto getCellStateFalse(@PathParam("address") String address) {
         User currentUser = userStore.getCurrentUser();
         Optional<Game> game = gameStore.getGameForUser(currentUser);
         CellStateDto cellStateDto = new CellStateDto();
         return game.map(g -> {
-            Optional<Cell> cell = gameStore.getCell(g, currentUser, address);
-            System.out.println(cell.toString());
+            Optional<Cell> cell = gameStore.getCell(g, currentUser, address,false);
+            cellStateDto.setAddress(address);
+            cell.ifPresent(c -> cellStateDto.setState(c.getState()));
+            return cellStateDto;
+        }).orElseThrow(IllegalStateException::new);
+    }
+
+    @GET
+    @RolesAllowed({"ADMIN", "USER"})
+    @Path("/statet/{address}")
+    public CellStateDto getCellStateTrue(@PathParam("address") String address) {
+        User currentUser = userStore.getCurrentUser();
+        Optional<Game> game = gameStore.getGameForUser(currentUser);
+        CellStateDto cellStateDto = new CellStateDto();
+        return game.map(g -> {
+            Optional<Cell> cell = gameStore.getCell(g, currentUser, address,true);
             cellStateDto.setAddress(address);
             cell.ifPresent(c -> cellStateDto.setState(c.getState()));
             return cellStateDto;
