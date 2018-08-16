@@ -7,8 +7,12 @@
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <title>Game</title>
 </head>
-<body onload="checkStatus(); init();">
+<body onload="checkStatus(); drawShips();">
+
 <div id="placement-field1" class="w3-hide w3-row">
+    <div class="w3-row">
+        <h1>Make your move</h1>
+    </div>
     <div class="w3-col" style="width:400px">
         <table>
             <tr>
@@ -53,6 +57,9 @@
     </div>
 </div>
 <div id="placement-field2" class="w3-hide w3-row">
+    <div class="w3-row">
+        <h1>Wait for another player move</h1>
+    </div>
     <div class="w3-col" style="width:400px">
         <table>
             <tr>
@@ -132,12 +139,13 @@
                 document.getElementById("placement-field2").classList.remove("w3-hide");
                 window.setTimeout(function () {
                     checkStatus();
+                    drawShips();
                 }, 1000);
             }
         });
     }
 
-    function init() {
+    function drawShips() {
         var i;
         var j;
         var address;
@@ -166,6 +174,9 @@
             if (cellstate.state === "SHIP") {
                 document.getElementById(address + "1").classList.add("w3-green");
                 document.getElementById(address + "2").classList.add("w3-green");
+            } else {
+                document.getElementById(address + "1").classList.add("w3-white");
+                document.getElementById(address + "2").classList.add("w3-white");
             }
         });
     }
