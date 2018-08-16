@@ -21,7 +21,8 @@
                 <tr>
                     <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small"><input type="radio" id="${col}${row}"
+                        <td class="w3-panel w3-border w3-padding-small"><input name="address" type="radio"
+                                                                               id="${col}${row}"
                                                                                onchange="cellClicked('${col}${row}')"/>
                         </td>
                     </c:forTokens>
@@ -41,8 +42,7 @@
                 <tr>
                     <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}2"
-                            ></td>
+                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}2"></td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
@@ -98,8 +98,10 @@
         data[id] = checkbox.checked ? "SHIP" : "EMPTY";
     }
     function fire() {
-        console.log("checking status");
-        fetch("<c:url value='/api/game/fire'/>", {
+        console.log("firing");
+        var checked = document.querySelector('input[name=address]:checked');
+        var checkedAddr = checked.id;
+        fetch("<c:url value='/api/game/fire'/>/" + checkedAddr, {
             "method": "POST",
             headers: {
                 'Accept': 'application/json',

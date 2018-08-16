@@ -67,7 +67,7 @@ public class GameApi {
                 for (Map.Entry<String, JsonValue> pair : field.entrySet()) {
                     log.info(pair.getKey() + " - " + pair.getValue());
                     String address = pair.getKey();
-                    String value = ((JsonString)pair.getValue()).getString();
+                    String value = ((JsonString) pair.getValue()).getString();
                     if ("SHIP".equals(value)) {
                         ships.add(address);
                     }
@@ -99,11 +99,28 @@ public class GameApi {
 
     @POST
     @RolesAllowed({"ADMIN", "USER"})
-    @Path("/fire")
-    public void doFire() {
+    @Path("/fire/{address}")
+    public void doFire(@PathParam("address") String address) {
+        log.info("Firing to " + address);
         User currentUser = userStore.getCurrentUser();
         Optional<Game> game = gameStore.getGameForUser(currentUser);
         game.ifPresent(g -> {
+            User oppositeUser = g.getOpposite(currentUser);
+            Optional<Cell> enemyCell = gameStore.findCell(g, oppositeUser, address, false);
+            if (enemyCell.isPresent()) {
+                Cell c = enemyCell.get();
+                if (c.getState() == CellState.SHIP) {
+                    c.setState(CellState.HIT);
+                    gameStore.setCellState(g, currentUser, address, true, CellState.HIT);
+                    return;
+                } else if (c.getState() == CellState.EMPTY) {
+                    c.setState(CellState.MISS);
+                    gameStore.setCellState(g, currentUser, address, true, CellState.MISS);
+                }
+            } else {
+                gameStore.setCellState(g, oppositeUser, address, false, CellState.MISS);
+                gameStore.setCellState(g, currentUser, address, true, CellState.MISS);
+            }
             boolean player1Active = g.isPlayer1Active();
             g.setPlayer1Active(!player1Active);
             g.setPlayer2Active(player1Active);

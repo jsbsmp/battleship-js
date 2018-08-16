@@ -57,18 +57,7 @@ public class GameStore {
 
 
     public void setCellState(Game game, User player, String address, boolean targetArea, CellState state) {
-        Optional<Cell> cell = em.createQuery(
-                "select c from Cell c " +
-                        "where c.game = :game " +
-                        "  and c.user = :user " +
-                        "  and c.targetArea = :target " +
-                        "  and c.address = :address", Cell.class)
-                .setParameter("game", game)
-                .setParameter("user", player)
-                .setParameter("target", targetArea)
-                .setParameter("address", address)
-                .getResultStream()
-                .findFirst();
+        Optional<Cell> cell = findCell(game, player, address, targetArea);
         if (cell.isPresent()) {
             cell.get().setState(state);
         } else {
@@ -80,6 +69,21 @@ public class GameStore {
             newCell.setState(state);
             em.persist(newCell);
         }
+    }
+
+    public Optional<Cell> findCell(Game game, User player, String address, boolean targetArea) {
+        return em.createQuery(
+                "select c from Cell c " +
+                        "where c.game = :game " +
+                        "  and c.user = :user " +
+                        "  and c.targetArea = :target " +
+                        "  and c.address = :address", Cell.class)
+                .setParameter("game", game)
+                .setParameter("user", player)
+                .setParameter("target", targetArea)
+                .setParameter("address", address)
+                .getResultStream()
+                .findFirst();
     }
 
     public void setShips(Game game, User user, boolean targetArea, List<String> ships) {
