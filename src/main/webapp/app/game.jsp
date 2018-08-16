@@ -21,9 +21,9 @@
                 <tr>
                     <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small"><input name="address" type="radio"
-                                                                               id="${col}${row}"
-                                                                               onchange="cellClicked('${col}${row}')"/>
+                        <td class="w3-panel w3-border w3-padding-small">
+                            <input name="address" type="radio" id="${col}${row}"
+                                   onchange="cellClicked('${col}${row}')"/>
                         </td>
                     </c:forTokens>
                 </tr>
@@ -42,7 +42,7 @@
                 <tr>
                     <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}2"></td>
+                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}1"></td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
@@ -83,7 +83,7 @@
                 <tr>
                     <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                     <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                        <td class="w3-panel w3-border w3-padding-small"></td>
+                        <td class="w3-panel w3-border w3-padding-small" id="${col}${row}2"></td>
                     </c:forTokens>
                 </tr>
             </c:forTokens>
@@ -164,6 +164,7 @@
             console.log("===> JSON.stringify(cellstate): " + JSON.stringify(cellstate));
             console.log("===> cellstate.state: " + cellstate.state);
             if (cellstate.state === "SHIP") {
+                document.getElementById(address + "1").classList.add("w3-green");
                 document.getElementById(address + "2").classList.add("w3-green");
             }
         });
