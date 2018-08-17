@@ -89,7 +89,7 @@ public class GameApi {
     @Path("/status")
     public GameDto getGameStatus() {
         User currentUser = userStore.getCurrentUser();
-        Optional<Game> game = gameStore.getGameForUser(currentUser);
+        Optional<Game> game = gameStore.getLatestGame(currentUser);
         return game.map(g -> {
             GameDto dto = new GameDto();
             dto.setStatus(g.getStatus());
@@ -104,7 +104,7 @@ public class GameApi {
     public void doFire(@PathParam("address") String address) {
         log.info("Firing to " + address);
         User currentUser = userStore.getCurrentUser();
-        Optional<Game> game = gameStore.getGameForUser(currentUser);
+        Optional<Game> game = gameStore.getLatestGame(currentUser);
         game.ifPresent(g -> {
             User oppositeUser = g.getOpposite(currentUser);
             Optional<Cell> enemyCell = gameStore.getCell(g, oppositeUser, address, false);
@@ -113,6 +113,7 @@ public class GameApi {
                 if (c.getState() == CellState.SHIP) {
                     c.setState(CellState.HIT);
                     gameStore.setCellState(g, currentUser, address, true, CellState.HIT);
+                    checkFinishedGameStatus(g, oppositeUser);
                     return;
                 } else if (c.getState() == CellState.EMPTY) {
                     c.setState(CellState.MISS);
@@ -126,6 +127,13 @@ public class GameApi {
             g.setPlayer1Active(!player1Active);
             g.setPlayer2Active(player1Active);
         });
+    }
+
+    private void checkFinishedGameStatus(Game game, User user) {
+        if (gameStore.getCells(game, user).stream()
+                .noneMatch(cs -> cs.getState() == CellState.SHIP)) {
+            game.setStatus(GameStatus.FINISHED);
+        }
     }
 
     @GET

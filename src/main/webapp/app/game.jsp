@@ -15,6 +15,10 @@
         td.HIT {
             background-color: darkred;
         }
+        td {
+            width: 20px;
+            text-align: center;
+        }
     </style>
 </head>
 <body onload="checkStatus()">
@@ -91,6 +95,9 @@
                 window.setTimeout(function () {
                     checkStatus();
                 }, 1000);
+            } else if (game.status === "FINISHED") {
+                location.href = "<c:url value='/app/gameOver.jsp'/>";
+                return;
             } else {
                 return;
             }
