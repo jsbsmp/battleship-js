@@ -39,7 +39,7 @@ public class GameStore {
                 .findFirst();
     }
 
-    public Optional<Game> getLatestGame(User user) {
+    public Optional<Game> getLatestGameFor(User user) {
         return em.createQuery(
                 "select g " +
                         "from Game g " +
