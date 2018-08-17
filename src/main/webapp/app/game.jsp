@@ -40,7 +40,7 @@
             <tr>
                 <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                 <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td id="t${col}${row}" class="w3-panel w3-border w3-padding-small">
+                    <td id="USER${col}${row}" class="w3-panel w3-border w3-padding-small">
                         <input name="address" type="radio" id="${col}${row}"/></td>
                 </c:forTokens>
             </tr>
@@ -59,7 +59,7 @@
             <tr>
                 <td class="w3-panel w3-border w3-padding-small"><c:out value="${row}"/></td>
                 <c:forTokens items="A,B,C,D,E,F,G,H,I,J" delims="," var="col">
-                    <td id="m${col}${row}" class="w3-panel w3-border w3-padding-small"></td>
+                    <td id="OPPONENT${col}${row}" class="w3-panel w3-border w3-padding-small"></td>
                 </c:forTokens>
             </tr>
         </c:forTokens>
@@ -116,7 +116,7 @@
             return response.json();
         }).then(function (cells) {
             cells.forEach(function (c) {
-                var id = (c.targetArea ? "t" : "m") + c.address;
+                var id = (c.targetArea) + c.address;
                 var tblCell = document.getElementById(id);
                 tblCell.className = c.state;
             });

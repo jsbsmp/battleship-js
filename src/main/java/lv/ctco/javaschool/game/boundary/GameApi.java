@@ -73,7 +73,7 @@ public class GameApi {
                         ships.add(address);
                     }
                 }
-                gameStore.setShips(g, currentUser, false, ships);
+                gameStore.setShips(g, currentUser, TargetArea.OPPONENT, ships);
                 g.setPlayerActive(currentUser, false);
                 if (!g.isPlayer1Active() && !g.isPlayer2Active()) {
                     g.setStatus(GameStatus.STARTED);
@@ -107,21 +107,21 @@ public class GameApi {
         Optional<Game> game = gameStore.getLatestGame(currentUser);
         game.ifPresent(g -> {
             User oppositeUser = g.getOpposite(currentUser);
-            Optional<Cell> enemyCell = gameStore.getCell(g, oppositeUser, address, false);
+            Optional<Cell> enemyCell = gameStore.getCell(g, oppositeUser, address, TargetArea.OPPONENT);
             if (enemyCell.isPresent()) {
                 Cell c = enemyCell.get();
                 if (c.getState() == CellState.SHIP) {
                     c.setState(CellState.HIT);
-                    gameStore.setCellState(g, currentUser, address, true, CellState.HIT);
+                    gameStore.setCellState(g, currentUser, address, TargetArea.USER, CellState.HIT);
                     checkFinishedGameStatus(g, oppositeUser);
                     return;
                 } else if (c.getState() == CellState.EMPTY) {
                     c.setState(CellState.MISS);
-                    gameStore.setCellState(g, currentUser, address, true, CellState.MISS);
+                    gameStore.setCellState(g, currentUser, address, TargetArea.USER, CellState.MISS);
                 }
             } else {
-                gameStore.setCellState(g, oppositeUser, address, false, CellState.MISS);
-                gameStore.setCellState(g, currentUser, address, true, CellState.MISS);
+                gameStore.setCellState(g, oppositeUser, address, TargetArea.OPPONENT, CellState.MISS);
+                gameStore.setCellState(g, currentUser, address, TargetArea.USER, CellState.MISS);
             }
             boolean player1Active = g.isPlayer1Active();
             g.setPlayer1Active(!player1Active);
@@ -152,7 +152,7 @@ public class GameApi {
 
     private CellStateDto convertToDto(Cell cell) {
         CellStateDto dto = new CellStateDto();
-        dto.setTargetArea(cell.isTargetArea());
+        dto.setTargetArea(cell.getTargetArea());
         dto.setAddress(cell.getAddress());
         dto.setState(cell.getState());
         return dto;

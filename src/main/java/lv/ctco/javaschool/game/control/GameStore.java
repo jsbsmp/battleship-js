@@ -1,10 +1,7 @@
 package lv.ctco.javaschool.game.control;
 
 import lv.ctco.javaschool.auth.entity.domain.User;
-import lv.ctco.javaschool.game.entity.Cell;
-import lv.ctco.javaschool.game.entity.CellState;
-import lv.ctco.javaschool.game.entity.Game;
-import lv.ctco.javaschool.game.entity.GameStatus;
+import lv.ctco.javaschool.game.entity.*;
 
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
@@ -55,7 +52,7 @@ public class GameStore {
     }
 
 
-    public void setCellState(Game game, User player, String address, boolean targetArea, CellState state) {
+    public void setCellState(Game game, User player, String address, TargetArea targetArea, CellState state) {
         Optional<Cell> cell = getCell(game, player, address, targetArea);
         if (cell.isPresent()) {
             cell.get().setState(state);
@@ -70,7 +67,7 @@ public class GameStore {
         }
     }
 
-    public void setShips(Game game, User user, boolean targetArea, List<String> ships) {
+    public void setShips(Game game, User user, TargetArea targetArea, List<String> ships) {
         clearField(game, user, targetArea);
         ships.stream()
                 .map(address -> {
@@ -84,7 +81,7 @@ public class GameStore {
                 }).forEach(e -> em.persist(e));
     }
 
-    private void clearField(Game game, User player, boolean targetArea) {
+    private void clearField(Game game, User player, TargetArea targetArea) {
         List<Cell> cells = em.createQuery("select c from Cell c " +
                 "where c.game = :game " +
                 "and c.user=:user " +
@@ -96,7 +93,7 @@ public class GameStore {
         cells.forEach(c -> em.remove(c));
     }
 
-    public Optional<Cell> getCell(Game game, User user, String address, boolean targetArea) {
+    public Optional<Cell> getCell(Game game, User user, String address, TargetArea targetArea) {
         return em.createQuery(
                 "select c from Cell c " +
                         "where c.user=:user and c.game=:game and c.address=:address and c.targetArea=:target", Cell.class)
