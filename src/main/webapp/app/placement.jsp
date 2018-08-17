@@ -31,12 +31,15 @@
     <button type="button" onclick="ready()">Ready!</button>
 </div>
 <script>
+
     var data = {};
+
     function cellClicked(id) {
         var checkbox = document.getElementById(id);
         console.log(id + " " + checkbox.checked);
         data[id] = checkbox.checked ? "SHIP" : "EMPTY";
     }
+
     function ready() {
         console.log("===> JSON.stringify(data): " + JSON.stringify(data));
         fetch("<c:url value='/api/game/cells'/>", {
@@ -51,6 +54,7 @@
             checkStatus()
         });
     }
+
     function checkStatus() {
         console.log("checking status");
         fetch("<c:url value='/api/game/status'/>", {
@@ -77,6 +81,7 @@
             }
         });
     }
+
 </script>
 </body>
 </html>

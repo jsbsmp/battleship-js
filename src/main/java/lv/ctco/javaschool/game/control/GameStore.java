@@ -115,4 +115,11 @@ public class GameStore {
                 .setParameter("user", player)
                 .getResultList();
     }
+
+    public List<Game> getFinishedGames(){
+        return em.createQuery(
+                "select g from Game g where g.status=:status",Game.class)
+                .setParameter("status",GameStatus.FINISHED)
+                .getResultList();
+    }
 }

@@ -15,15 +15,20 @@ public class Game {
     @ManyToOne
     private User player1;
     private boolean player1Active;
+    private Long player1moves;
 
     @ManyToOne
     private User player2;
     private boolean player2Active;
+    private Long player2moves;
 
     @Enumerated(EnumType.STRING)
     private GameStatus status;
 
-    private String winner;
+    @OneToOne
+    private User winner;
+
+    private Long winnerMoves;
 
     public boolean isPlayerActive(User player) {
         if (player.equals(player1)) {
@@ -53,5 +58,9 @@ public class Game {
         } else {
             throw new IllegalArgumentException();
         }
+    }
+
+    public void chooseWinnerMoves() {
+        this.winnerMoves = winner.equals(player1) ? player1moves : player2moves;
     }
 }
