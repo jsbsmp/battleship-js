@@ -15,12 +15,12 @@ public class Game {
     @ManyToOne
     private User player1;
     private boolean player1Active;
-    private Long player1moves;
+    private int player1Moves;
 
     @ManyToOne
     private User player2;
     private boolean player2Active;
-    private Long player2moves;
+    private int player2Moves;
 
     @Enumerated(EnumType.STRING)
     private GameStatus status;
@@ -28,7 +28,7 @@ public class Game {
     @OneToOne
     private User winner;
 
-    private Long winnerMoves;
+    private int winnerMoves;
 
     public boolean isPlayerActive(User player) {
         if (player.equals(player1)) {
@@ -61,6 +61,14 @@ public class Game {
     }
 
     public void chooseWinnerMoves() {
-        this.winnerMoves = winner.equals(player1) ? player1moves : player2moves;
+        this.winnerMoves = winner.equals(player1) ? player1Moves : player2Moves;
+    }
+
+    public void increasePlayerMoves(User user){
+        if (user.equals(player1)) {
+            player1Moves++;
+        } else {
+            player2Moves++;
+        }
     }
 }

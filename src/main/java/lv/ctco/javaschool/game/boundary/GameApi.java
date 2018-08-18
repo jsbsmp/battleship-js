@@ -103,6 +103,7 @@ public class GameApi {
         User currentUser = userStore.getCurrentUser();
         Optional<Game> game = gameStore.getLatestGameFor(currentUser);
         game.ifPresent(g -> {
+            g.increasePlayerMoves(currentUser);
             User oppositeUser = g.getOpposite(currentUser);
             Optional<Cell> enemyCell = gameStore.getCell(g, oppositeUser, address, TargetArea.OPPONENT);
             if (enemyCell.isPresent()) {
@@ -120,11 +121,6 @@ public class GameApi {
                 gameStore.setCellState(g, oppositeUser, address, TargetArea.OPPONENT, CellState.MISS);
                 gameStore.setCellState(g, currentUser, address, TargetArea.USER, CellState.MISS);
             }
-            if (currentUser.equals(g.getPlayer1())) {
-                g.setPlayer1moves(g.getPlayer1moves() + 1);
-            } else {
-                g.setPlayer2moves(g.getPlayer2moves() + 1);
-            }
             boolean player1Active = g.isPlayer1Active();
             g.setPlayer1Active(!player1Active);
             g.setPlayer2Active(player1Active);
@@ -138,6 +134,7 @@ public class GameApi {
                 .noneMatch(cs -> cs.getState() == CellState.SHIP)) {
             game.setStatus(GameStatus.FINISHED);
             game.setWinner(userStore.getCurrentUser());
+            game.chooseWinnerMoves();
         }
     }
 
@@ -176,48 +173,27 @@ public class GameApi {
         }).orElseThrow(IllegalStateException::new);
     }
 
-    @GET
-    @RolesAllowed({"ADMIN", "USER"})
-    @Path("/games")
-    public List<GameDto> getFinishedGames() {
+    private Set<FinishedGameDto> getFinishedGames() {
         List<Game> finishedGames = gameStore.getFinishedGames();
         return finishedGames.stream().sorted(Comparator.comparing(Game::getWinnerMoves))
-                .map(this::convertToGameDto)
-                .collect(Collectors.toList());
+                .map(this::convertToFinishedGameDto)
+                .collect(Collectors.toSet());
     }
 
-    private GameDto convertToGameDto(Game game) {
-        GameDto dto = new GameDto();
-        dto.setWinner(game.getWinner());
+    private FinishedGameDto convertToFinishedGameDto(Game game) {
+        FinishedGameDto dto = new FinishedGameDto();
+        dto.setWinnerName(game.getWinner().getUsername());
         dto.setWinnerMoves(game.getWinnerMoves());
         return dto;
-    }
-
-    public List<Game> getSortedFinishedGames() {
-        List<Game> finishedGames = gameStore.getFinishedGames();
-        return finishedGames.stream().sorted(Comparator.comparing(Game::getWinnerMoves))
-                .collect(Collectors.toList());
     }
 
     @GET
     @RolesAllowed({"ADMIN", "USER"})
     @Path("/winners")
-    public List<UserDto> getWinners() {
-        List<User> winners = new ArrayList<>();
-        List<Game> sortedFinishedGames = getSortedFinishedGames();
-        for (Game game : sortedFinishedGames) {
-            winners.add(game.getWinner());
-        }
-        return winners.stream().sorted(Comparator.comparing(User::getVictories))
-                .map(this::convertToUserDto)
-                .collect(Collectors.toList());
-    }
-
-    private UserDto convertToUserDto(User user) {
-        UserDto dto = new UserDto();
-        dto.setUsername(user.getUsername());
-        dto.setVictories(user.getVictories());
-        return dto;
+    public FinishedGameDtoList getWinners() {
+        FinishedGameDtoList finishedGameDtoList = new FinishedGameDtoList();
+        finishedGameDtoList.setWinners(new ArrayList<>(getFinishedGames()));
+        return finishedGameDtoList;
     }
 
 }

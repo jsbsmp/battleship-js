@@ -6,6 +6,5 @@ import lombok.Data;
 public class UserDto {
 
     private String username;
-    private Long victories;
     private boolean isActive;
 }

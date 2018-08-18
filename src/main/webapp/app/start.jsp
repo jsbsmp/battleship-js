@@ -3,29 +3,28 @@
 <html>
 <title>Title</title>
 <script src="http://www.w3schools.com/lib/w3data.js"></script>
-<body onload="getFinishedGames()">
+<body onload="displayWinners()">
 <button type="button" onclick="logout()">Log out</button>
 <button type="button" onclick="startGame()">Start Game</button>
 <br><br>
-<div id="error-panel" class="w3-panel w3-red w3-hide">
-    <h3>Error!</h3>
-    <p>{{message}}</p>
-</div>
 
-
-
-
+<table id="winners">
+    <tr>
+        <td>
+            <hi>Winners</hi>
+        </td>
+    </tr>
+    <tr>
+        <th>Username</th>
+        <th>Moves</th>
+    </tr>
+    <tr w3-repeat="winners">
+        <td>{{winnerName}}</td>
+        <td>{{winnerMoves}}</td>
+    </tr>
+</table>
 
 <script>
-
-
-
-
-    function showError(msg) {
-        var errorPanel = document.getElementById("error-panel");
-        errorPanel.classList.remove("w3-hide");
-        w3DisplayData("error-panel", {"message" : msg});
-    }
 
     function logout() {
         fetch("<c:url value='/api/auth/logout'/>", {"method": "POST"})
@@ -41,26 +40,9 @@
             });
     }
 
-    function getFinishedGames() {
-        fetch("<c:url value='/api/game/games'/>", {
-            "method": "GET",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
-        }).then(function (response) {
-            return response.json();
-        }).then(function (games) {
-            games.forEach(function (g) {
-                console.log(g.winner);
-                console.log(g.winnerMoves)
-                showError(g.winner);
-            });
-        });
-    }
 
-    function printWinners() {
-        fetch("<c:url value='/api/game/winners'/>", {
+    function displayWinners() {
+        fetch("<c:url value="/api/game/winners"/>", {
             "method": "GET",
             headers: {
                 'Accept': 'application/json',
@@ -69,14 +51,8 @@
         }).then(function (response) {
             return response.json();
         }).then(function (winners) {
-            winners.forEach(function (u) {
-                console.log(u.username);
-                console.log(u.victories);
-
-
-                showError(u.username);
-
-            });
+            console.log(JSON.stringify(winners));
+            w3DisplayData("winners", winners);
         });
     }
 

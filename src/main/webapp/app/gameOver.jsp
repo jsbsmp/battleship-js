@@ -4,10 +4,14 @@
 <head>
     <title>Game Over</title>
 </head>
+<script src="http://www.w3schools.com/lib/w3data.js"></script>
 </html>
 <body onload="showWinner()">
 <label>The winner is: </label><br>
-<input type="text"/><br>
+<div id="message-panel">
+    <p>{{message}}</p>
+</div>
+<br><br>
 <a href="start.jsp">Start a new game</a>
 <script>
 
@@ -21,9 +25,10 @@
         }).then(function (response) {
             return response.json();
         }).then(function (user) {
-            document.querySelector('input').setAttribute("value", user.username);
+            w3DisplayData("message-panel", {"message": user.username});
         });
     }
+
 </script>
 
 </body>

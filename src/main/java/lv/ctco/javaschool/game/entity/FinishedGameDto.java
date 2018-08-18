@@ -2,29 +2,26 @@ package lv.ctco.javaschool.game.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import lv.ctco.javaschool.auth.entity.domain.User;
 
 import java.util.Objects;
 
-@Getter
 @Setter
-public class GameDto {
+@Getter
+public class FinishedGameDto {
 
-    private GameStatus status;
-    private boolean playerActive;
-    private User winner;
+    private String winnerName;
     private int winnerMoves;
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        GameDto gameDto = (GameDto) o;
-        return Objects.equals(winner, gameDto.winner);
+        FinishedGameDto that = (FinishedGameDto) o;
+        return Objects.equals(winnerName, that.winnerName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(winner);
+        return Objects.hash(winnerName);
     }
 }
